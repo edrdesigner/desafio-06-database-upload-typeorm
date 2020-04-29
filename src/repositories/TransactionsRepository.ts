@@ -16,10 +16,15 @@ class TransactionsRepository extends Repository<Transaction> {
     return transactions.reduce(
       (balanceCalc, transaction) => {
         const balance = balanceCalc;
+
         if (transaction.type === 'income') {
-          balance.income += transaction.value;
+          balance.income += Number.parseFloat(
+            transaction.value ? transaction.value.toString() : '0',
+          );
         } else {
-          balance.outcome += transaction.value;
+          balance.outcome += Number.parseFloat(
+            transaction.value ? transaction.value.toString() : '0',
+          );
         }
 
         balance.total = balance.income - balance.outcome;

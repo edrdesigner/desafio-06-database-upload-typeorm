@@ -14,6 +14,10 @@ export default class CreateCategory1588074883341 implements MigrationInterface {
             default: 'uuid_generate_v4()',
           },
           {
+            name: 'title',
+            type: 'varchar',
+          },
+          {
             name: 'created_at',
             type: 'timestamp',
             default: 'now()',

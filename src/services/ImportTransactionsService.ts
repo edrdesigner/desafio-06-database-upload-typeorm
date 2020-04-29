@@ -25,20 +25,23 @@ class ImportTransactionsService {
     const transactionRepository = getCustomRepository(TransactionsRepository);
 
     const filePath = path.join(uploadConfig.directory, filename);
+    const transactionReadStream = fs.createReadStream(filePath);
 
-    const parseCSV = csvParse({
+    const parsers = csvParse({
       from_line: 2,
     });
+
+    const parseCSV = transactionReadStream.pipe(parsers);
 
     const transactions: CSVTransaction[] = [];
     const categories: string[] = [];
 
     parseCSV.on('data', async line => {
-      const { title, type, value, category } = line.map((cell: string) =>
+      const [title, type, value, category] = line.map((cell: string) =>
         cell.trim(),
       );
 
-      if (!title || !type || !value) return;
+      if (!title || !type || !value || !category) return;
 
       categories.push(category);
       transactions.push({ title, type, value, category });
@@ -56,7 +59,7 @@ class ImportTransactionsService {
 
     const addCategoryTitles = categories
       .filter((category: string) => !existendCategoriesTitle.includes(category))
-      .filter((value, index, self) => self.indexOf(value) === index); // revmoe duplicates
+      .filter((value, index, self) => self.indexOf(value) === index); // remove duplicates
 
     const newCategories = categoriesRepository.create(
       addCategoryTitles.map(title => ({ title })),

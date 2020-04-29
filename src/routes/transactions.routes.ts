@@ -20,7 +20,7 @@ transactionsRouter.get('/', async (request, response) => {
     relations: ['category'],
   });
 
-  const balance = transactionRepository.getBalance();
+  const balance = await transactionRepository.getBalance();
 
   return response.status(200).json({ transactions, balance });
 });
@@ -51,6 +51,7 @@ transactionsRouter.post(
   upload.single('file'),
   async (request, response) => {
     const { filename } = request.file;
+
     const importTransaction = new ImportTransactionsService();
 
     const transactions = await importTransaction.execute({ filename });
